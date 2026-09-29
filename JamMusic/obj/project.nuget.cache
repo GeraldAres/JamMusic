@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "NbCYfAnQAPg=",
+  "success": true,
+  "projectFilePath": "C:\\3rd year\\TaraKain\\TaraKain\\JamMusic\\JamMusic.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\bened\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.12\\microsoft.aspnetcore.app.internal.assets.10.0.12.nupkg.sha512"
+  ],
+  "logs": []
+}
