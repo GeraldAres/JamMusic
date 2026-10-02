@@ -1,0 +1,45 @@
+@using JamMusic.Components.Sections
+
+<div class="absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-2xl border border-white/20 bg-black/25 px-3 py-3 backdrop-blur-xl md:inset-x-8 md:gap-5 md:px-4">
+    <img src="@Track.AlbumArt" alt="Album artwork for @Track.Title" class="h-12 w-12 rounded-xl object-cover md:h-14 md:w-14" />
+
+    <div class="min-w-0 flex-1">
+        <div class="flex items-center justify-between gap-4">
+            <div class="min-w-0">
+                <p class="truncate text-sm font-bold text-white md:text-base">@Track.Title</p>
+                <p class="truncate text-xs text-white/70 md:text-sm">@Track.Artist</p>
+            </div>
+            <span class="shrink-0 text-[0.65rem] font-medium tracking-[0.18em] text-white/70 md:text-[0.7rem]">@Track.CurrentTime / @Track.TotalDuration</span>
+        </div>
+
+        <div class="mt-3 flex items-center gap-3 md:gap-4">
+            <button type="button" aria-label="Pause playback" class="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/90 transition hover:bg-white/10 md:h-9 md:w-9">
+                <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current" aria-hidden="true" focusable="false">
+                    <path d="M6 5h3v14H6zm9 0h3v14h-3z"/>
+                </svg>
+            </button>
+
+            <div class="flex-1">
+                <div class="h-1.5 overflow-hidden rounded-full bg-white/15">
+                    <div class="h-full w-[38%] rounded-full bg-white"></div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 md:gap-3">
+                <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current text-white/80" aria-hidden="true" focusable="false">
+                    <path d="M14.5 3.5a.75.75 0 0 1 .55.24L20 9.5a.75.75 0 0 1 0 1.06l-4.95 5.76a.75.75 0 0 1-1.3-.24V14H7.75A2.75 2.75 0 0 1 5 11.25v-1.5A2.75 2.75 0 0 1 7.75 7H13v-1.5a.75.75 0 0 1 .5-.99zm-.5 2.03v2.22a.75.75 0 0 1-.75.75H7.75A1.25 1.25 0 0 0 6.5 9.75v1.5a1.25 1.25 0 0 0 1.25 1.25h5.5a.75.75 0 0 1 .75.75v2.22l3.56-4.22-3.56-4.22z"/>
+                </svg>
+                <div class="w-14 md:w-20">
+                    <div class="h-1.5 overflow-hidden rounded-full bg-white/15">
+                        <div class="h-full w-[60%] rounded-full bg-white"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PlayerTrack Track { get; set; } = new();
+}

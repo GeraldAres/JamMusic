@@ -1,0 +1,26 @@
+@using JamMusic.Components.Sections
+
+<section id="visualizer" class="relative overflow-hidden bg-[#05003a] px-4 pb-20 pt-12 md:px-8 md:pb-24 md:pt-16">
+    <div class="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-white/20 bg-[#090f2d] shadow-[0_26px_80px_rgba(0,0,0,0.48)]">
+        <div class="absolute inset-0 z-0">
+            <img src="/assets/gifs/visualizer-placeholder.gif" alt="" class="h-full w-full object-cover" loading="eager" />
+            <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(10,15,45,0.12) 0%, rgba(10,15,45,0.06) 30%, rgba(11,8,35,0.55) 100%);"></div>
+        </div>
+
+        <div class="relative z-10 flex min-h-[28rem] flex-col justify-between px-3 pb-24 pt-8 md:min-h-[40rem] md:px-6 md:pb-28 md:pt-10">
+            <div class="mx-auto inline-flex items-center rounded-full border border-white/30 bg-black/25 px-4 py-2 backdrop-blur-xl md:px-5">
+                <span class="text-[0.6rem] font-black uppercase tracking-[0.28em] text-white md:text-[0.65rem]">
+                    <span class="text-white">Jam</span><span class="text-white/70">Music</span>
+                </span>
+            </div>
+
+            <PlayerBar Track="Track" />
+        </div>
+
+        <audio src="@Track.AudioSource" preload="metadata"></audio>
+    </div>
+</section>
+
+@code {
+    private PlayerTrack Track { get; } = new();
+}
