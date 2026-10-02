@@ -25,6 +25,8 @@ node_modules/
 
 # Tailwind generated output (optional: keep generated CSS out of source control)
 wwwroot/css/tailwind.css
+**/wwwroot/css/tailwind.css
+JamMusic/wwwroot/css/tailwind.css
 
 # OS / editor files
 .DS_Store

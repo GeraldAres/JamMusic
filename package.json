@@ -1,0 +1,27 @@
+{
+  "name": "tarakain",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "tailwind:build": "npx tailwindcss -i ./JamMusic/wwwroot/css/tailwind-input.css -o ./JamMusic/wwwroot/css/tailwind.css --minify",
+    "tailwind:watch": "npx tailwindcss -i ./JamMusic/wwwroot/css/tailwind-input.css -o ./JamMusic/wwwroot/css/tailwind.css --watch",
+    "dev": "npm run tailwind:watch",
+    "build": "npm run tailwind:build && dotnet build",
+    "publish:app": "npm run tailwind:build && dotnet publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GeraldAres/JamMusic.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GeraldAres/JamMusic/issues"
+  },
+  "homepage": "https://github.com/GeraldAres/JamMusic#readme",
+  "description": "",
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
