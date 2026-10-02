@@ -1,0 +1,54 @@
+# Build outputs
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.dbmdl
+*.cache
+*.pdb
+*.log
+
+# Node / frontend tooling
+node_modules/
+.npm/
+.pnpm-store/
+
+# Tailwind generated output (optional: keep generated CSS out of source control)
+wwwroot/css/tailwind.css
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+
+# Test results
+TestResults/
+coverage/
+*.trx
+
+# NuGet package restore
+packages/
+*.nupkg
+
+# Rider / JetBrains
+.idea/
+*.iml
+
+# ASP.NET Core / .NET generated artifacts
+project.lock.json
+*.dll
+*.exe
+*.apphost
+
+# Local env files
+.env
+.env.*
