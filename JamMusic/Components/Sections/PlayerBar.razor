@@ -1,4 +1,6 @@
 @using JamMusic.Components.Sections
+@inject PlaybackState Playback
+@implements IDisposable
 
 <div class="absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-2xl border border-white/20 bg-black/25 px-3 py-3 backdrop-blur-xl md:inset-x-8 md:gap-5 md:px-4">
     <img src="@Track.AlbumArt" alt="Album artwork for @Track.Title" class="h-12 w-12 rounded-xl object-cover md:h-14 md:w-14" />
@@ -13,15 +15,27 @@
         </div>
 
         <div class="mt-3 flex items-center gap-3 md:gap-4">
-            <button type="button" aria-label="Pause playback" class="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/90 transition hover:bg-white/10 md:h-9 md:w-9">
-                <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current" aria-hidden="true" focusable="false">
-                    <path d="M6 5h3v14H6zm9 0h3v14h-3z"/>
-                </svg>
+            <button type="button"
+                    aria-label="@(Playback.IsPlaying ? "Pause playback" : "Play playback")"
+                    disabled="@(Playback.Status is PlaybackStatus.Idle or PlaybackStatus.Loading or PlaybackStatus.Error)"
+                    class="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/90 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40 md:h-9 md:w-9">
+                @if (Playback.IsPlaying)
+                {
+                    <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current" aria-hidden="true" focusable="false">
+                        <path d="M6 5h3v14H6zm9 0h3v14h-3z"/>
+                    </svg>
+                }
+                else
+                {
+                    <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current" aria-hidden="true" focusable="false">
+                        <path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.08-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/>
+                    </svg>
+                }
             </button>
 
             <div class="flex-1">
                 <div class="h-1.5 overflow-hidden rounded-full bg-white/15">
-                    <div class="h-full w-[38%] rounded-full bg-white"></div>
+                    <div class="h-full rounded-full bg-white" style="width: @ProgressWidth"></div>
                 </div>
             </div>
 
@@ -31,7 +45,7 @@
                 </svg>
                 <div class="w-14 md:w-20">
                     <div class="h-1.5 overflow-hidden rounded-full bg-white/15">
-                        <div class="h-full w-[60%] rounded-full bg-white"></div>
+                        <div class="h-full rounded-full bg-white" style="width: @VolumeWidth"></div>
                     </div>
                 </div>
             </div>
@@ -42,4 +56,17 @@
 @code {
     [Parameter]
     public PlayerTrack Track { get; set; } = new();
+
+    private string ProgressWidth => $"{Playback.ProgressPercent:0.##}%";
+
+    private string VolumeWidth => $"{Playback.Volume * 100:0.##}%";
+
+    protected override void OnInitialized()
+    {
+        Playback.Changed += OnPlaybackChanged;
+    }
+
+    private void OnPlaybackChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Playback.Changed -= OnPlaybackChanged;
 }

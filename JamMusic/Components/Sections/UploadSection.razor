@@ -1,3 +1,6 @@
+@inject PlaybackState Playback
+@implements IDisposable
+
 <section id="upload" class="relative overflow-hidden bg-black px-4 pb-16 pt-16 md:pb-24 md:pt-20">
     <div class="relative z-10 mx-auto max-w-3xl text-center">
         <p class="text-sm font-medium uppercase tracking-[0.32em] text-white/70 md:text-base">Upload Music</p>
@@ -7,21 +10,57 @@
             Choose a song from your device or connect your Spotify account.
         </p>
 
-        <button
-            type="button"
-            class="group mt-8 inline-flex items-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_32px_rgba(255,255,255,0.12)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_18px_36px_rgba(255,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-white/80 focus:ring-offset-2 focus:ring-offset-black md:px-8 md:py-4 md:text-base"
-            aria-label="Connect to Spotify"
-        >
-            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-[#1ED760] text-slate-900">
-                <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current" aria-hidden="true" focusable="false">
-                    <path d="M12 0C5.373 0 0 5.373 0 12c0 6.627 5.373 12 12 12s12-5.373 12-12C24 5.373 18.627 0 12 0zm5.51 17.08c-.19.31-.59.4-.9.21-2.49-1.52-5.61-1.87-9.3-1.02-.36.1-.72-.14-.82-.5-.1-.36.14-.72.5-.82 4.06-1.01 7.59-.57 10.5 1.27.31.18.4.58.22.9zm1.3-2.88c-.24.38-.74.5-1.12.26-2.85-1.75-7.18-2.26-10.54-1.23-.43.13-.89-.12-1.02-.55-.13-.43.12-.89.55-1.02 3.93-1.18 8.82-.58 12.14 1.4.38.24.5.74.26 1.12zm.12-2.92c-3.42-2.03-9.07-2.2-12.33-1.22-.52.16-1.06-.13-1.22-.65-.16-.52.13-1.06.65-1.22 3.9-1.17 10.38-.94 14.48 1.42.47.28.62.9.34 1.36-.28.47-.9.62-1.36.34z"/>
-                </svg>
-            </span>
-            <span>Connect to Spotify</span>
-        </button>
+        <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <label class="group inline-flex cursor-pointer items-center gap-3 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(0,0,0,0.18)] transition-all duration-200 hover:scale-[1.02] hover:bg-white/15 focus-within:outline-none focus-within:ring-2 focus-within:ring-white/80 focus-within:ring-offset-2 focus-within:ring-offset-black md:px-8 md:py-4 md:text-base">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-white text-slate-900">
+                    <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current" aria-hidden="true" focusable="false">
+                        <path d="M12 3a1 1 0 0 1 1 1v8.59l2.3-2.3a1 1 0 1 1 1.4 1.42l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.42L11 12.59V4a1 1 0 0 1 1-1zm-7 14a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z"/>
+                    </svg>
+                </span>
+                <span>Choose a song</span>
+                <input type="file" accept=".mp3,.wav,.ogg,audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/vorbis" class="sr-only" aria-label="Choose a local audio file" />
+            </label>
+
+            <button
+                type="button"
+                class="group inline-flex items-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_32px_rgba(255,255,255,0.12)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_18px_36px_rgba(255,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-white/80 focus:ring-offset-2 focus:ring-offset-black md:px-8 md:py-4 md:text-base"
+                aria-label="Connect to Spotify"
+            >
+                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-[#1ED760] text-slate-900">
+                    <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current" aria-hidden="true" focusable="false">
+                        <path d="M12 0C5.373 0 0 5.373 0 12c0 6.627 5.373 12 12 12s12-5.373 12-12C24 5.373 18.627 0 12 0zm5.51 17.08c-.19.31-.59.4-.9.21-2.49-1.52-5.61-1.87-9.3-1.02-.36.1-.72-.14-.82-.5-.1-.36.14-.72.5-.82 4.06-1.01 7.59-.57 10.5 1.27.31.18.4.58.22.9zm1.3-2.88c-.24.38-.74.5-1.12.26-2.85-1.75-7.18-2.26-10.54-1.23-.43.13-.89-.12-1.02-.55-.13-.43.12-.89.55-1.02 3.93-1.18 8.82-.58 12.14 1.4.38.24.5.74.26 1.12zm.12-2.92c-3.42-2.03-9.07-2.2-12.33-1.22-.52.16-1.06-.13-1.22-.65-.16-.52.13-1.06.65-1.22 3.9-1.17 10.38-.94 14.48 1.42.47.28.62.9.34 1.36-.28.47-.9.62-1.36.34z"/>
+                    </svg>
+                </span>
+                <span>Connect to Spotify</span>
+            </button>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Playback.ErrorMessage))
+        {
+            <p class="mx-auto mt-5 max-w-lg text-sm text-rose-300" role="alert">@Playback.ErrorMessage</p>
+        }
+        else if (Playback.Status == PlaybackStatus.Loading)
+        {
+            <p class="mx-auto mt-5 max-w-lg text-sm text-white/70">Loading @Playback.Track.Title…</p>
+        }
+        else if (Playback.Status is PlaybackStatus.Ready or PlaybackStatus.Playing or PlaybackStatus.Paused or PlaybackStatus.Ended)
+        {
+            <p class="mx-auto mt-5 max-w-lg text-sm text-white/70">Ready to play @Playback.Track.Title</p>
+        }
     </div>
 
     <div class="pointer-events-none relative mt-20 h-20 md:mt-28">
         <div class="absolute inset-x-[-10%] bottom-0 h-24 rounded-t-[999px] bg-[#05003a] shadow-[0_-40px_80px_rgba(9,9,34,0.9)] md:h-32"></div>
     </div>
 </section>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Playback.Changed += OnPlaybackChanged;
+    }
+
+    private void OnPlaybackChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Playback.Changed -= OnPlaybackChanged;
+}

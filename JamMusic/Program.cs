@@ -1,10 +1,12 @@
 using JamMusic.Components;
+using JamMusic.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddScoped<PlaybackState>();
 
 var app = builder.Build();
 

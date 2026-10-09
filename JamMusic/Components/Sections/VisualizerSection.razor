@@ -1,4 +1,6 @@
 @using JamMusic.Components.Sections
+@inject PlaybackState Playback
+@implements IDisposable
 
 <section id="visualizer" class="relative overflow-hidden bg-[#05003a] px-4 pb-20 pt-12 md:px-8 md:pb-24 md:pt-16">
     <div class="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-white/20 bg-[#090f2d] shadow-[0_26px_80px_rgba(0,0,0,0.48)]">
@@ -14,13 +16,20 @@
                 </span>
             </div>
 
-            <PlayerBar Track="Track" />
+            <PlayerBar Track="Playback.Track" />
         </div>
 
-        <audio src="@Track.AudioSource" preload="metadata"></audio>
+        <audio src="@Playback.Track.AudioSource" preload="metadata"></audio>
     </div>
 </section>
 
 @code {
-    private PlayerTrack Track { get; } = new();
+    protected override void OnInitialized()
+    {
+        Playback.Changed += OnPlaybackChanged;
+    }
+
+    private void OnPlaybackChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Playback.Changed -= OnPlaybackChanged;
 }
