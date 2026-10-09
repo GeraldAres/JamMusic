@@ -26,6 +26,7 @@ const state = {
     bass: 0,
     mid: 0,
     treble: 0,
+    signal: 0,
     idlePhase: 0
 };
 
@@ -200,13 +201,16 @@ async function loadFile(file, playWhenReady) {
     state.loading = true;
     state.seeking = false;
     state.currentTitle = stripExtension(file.name);
+    state.bass = 0;
+    state.mid = 0;
+    state.treble = 0;
+    state.signal = 0;
     await notify('OnLoading', file.name);
 
     const nextUrl = URL.createObjectURL(file);
     const previousUrl = state.objectUrl;
     state.objectUrl = nextUrl;
     state.audio.src = nextUrl;
-    state.audio.load();
 
     if (previousUrl && previousUrl !== nextUrl) {
         URL.revokeObjectURL(previousUrl);
@@ -453,7 +457,8 @@ function drawAura() {
 
     const playing = Boolean(state.audio && !state.audio.paused && !state.audio.ended);
     readBands(playing);
-    state.idlePhase += playing ? 0.018 : 0.008;
+    const active = playing && state.signal > 0.015;
+    state.idlePhase += active ? 0.018 : playing ? 0 : 0.008;
 
     const ctx = state.ctx;
     ctx.clearRect(0, 0, width, height);
@@ -464,7 +469,7 @@ function drawAura() {
     const bass = state.bass;
     const mid = state.mid;
     const treble = state.treble;
-    const energy = playing ? 0.55 + bass * 0.45 : 0.22 + breath * 0.08;
+    const energy = active ? 0.55 + bass * 0.45 : 0.22 + breath * 0.08;
 
     const background = ctx.createRadialGradient(cx, cy, 12, cx, cy, Math.max(width, height) * 0.72);
     background.addColorStop(0, `rgba(${90 + mid * 80}, ${50 + bass * 40}, ${150 + treble * 70}, ${0.28 + energy * 0.25})`);
@@ -473,25 +478,25 @@ function drawAura() {
     ctx.fillStyle = background;
     ctx.fillRect(0, 0, width, height);
 
-    const radius = Math.min(width, height) * (0.14 + bass * 0.16 + (playing ? 0 : breath * 0.02));
+    const radius = Math.min(width, height) * (0.14 + (active ? bass * 0.16 : 0) + (playing ? 0 : breath * 0.02));
 
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    const glow = ctx.createRadialGradient(cx, cy, radius * 0.15, cx, cy, radius * (2.1 + bass * 1.4));
-    glow.addColorStop(0, `rgba(141, 231, 210, ${0.28 + bass * 0.55})`);
-    glow.addColorStop(0.32, `rgba(245, 191, 217, ${0.18 + mid * 0.4})`);
-    glow.addColorStop(0.62, `rgba(185, 177, 255, ${0.12 + treble * 0.32})`);
+    const glow = ctx.createRadialGradient(cx, cy, radius * 0.15, cx, cy, radius * (2.1 + (active ? bass * 1.4 : 0)));
+    glow.addColorStop(0, `rgba(141, 231, 210, ${active ? 0.28 + bass * 0.55 : 0.1 + breath * 0.04})`);
+    glow.addColorStop(0.32, `rgba(245, 191, 217, ${active ? 0.18 + mid * 0.4 : 0.08 + breath * 0.03})`);
+    glow.addColorStop(0.62, `rgba(185, 177, 255, ${active ? 0.12 + treble * 0.32 : 0.06 + breath * 0.02})`);
     glow.addColorStop(1, 'rgba(5, 0, 58, 0)');
     ctx.fillStyle = glow;
     ctx.beginPath();
-    ctx.arc(cx, cy, radius * (2.6 + bass * 1.1), 0, Math.PI * 2);
+    ctx.arc(cx, cy, radius * (2.6 + (active ? bass * 1.1 : 0)), 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
-    drawWave(ctx, cx, cy, radius, playing);
+    drawWave(ctx, cx, cy, radius, active);
 }
 
-function drawWave(ctx, cx, cy, radius, playing) {
+function drawWave(ctx, cx, cy, radius, active) {
     const data = state.timeData;
     ctx.beginPath();
     const points = 160;
@@ -502,12 +507,10 @@ function drawWave(ctx, cx, cy, radius, playing) {
         if (data && data.length > 0) {
             const index = Math.floor(t * (data.length - 1));
             sample = (data[index] - 128) / 128;
-        } else {
-            sample = Math.sin(angle * 3 + state.idlePhase) * 0.12;
         }
 
-        const deform = playing ? 0.24 + state.treble * 0.22 : 0.08;
-        const r = radius * (1.12 + sample * deform + state.bass * 0.08);
+        const deform = active ? 0.24 + state.treble * 0.22 : 0.08;
+        const r = radius * (1.12 + sample * (active ? deform : 0) + (active ? state.bass * 0.08 : 0));
         const x = cx + Math.cos(angle) * r;
         const y = cy + Math.sin(angle) * r;
         if (i === 0) {
@@ -518,26 +521,35 @@ function drawWave(ctx, cx, cy, radius, playing) {
     }
 
     ctx.closePath();
-    ctx.strokeStyle = `rgba(255, 220, 156, ${0.22 + state.treble * 0.5})`;
-    ctx.lineWidth = playing ? 2.4 : 1.4;
+    ctx.strokeStyle = `rgba(255, 220, 156, ${active ? 0.22 + state.treble * 0.5 : 0.12})`;
+    ctx.lineWidth = active ? 2.4 : 1.4;
     ctx.stroke();
 }
 
 function readBands(playing) {
     if (!state.analyser || !state.freqData || !state.timeData) {
         decayBands(playing ? 0.08 : 0.04);
+        state.signal = Math.max(0, state.signal - (playing ? 0.08 : 0.04));
         return;
     }
 
     state.analyser.getByteFrequencyData(state.freqData);
     state.analyser.getByteTimeDomainData(state.timeData);
+    let sumSquares = 0;
+    for (const sample of state.timeData) {
+        const normalizedSample = (sample - 128) / 128;
+        sumSquares += normalizedSample * normalizedSample;
+    }
+
+    const signal = Math.sqrt(sumSquares / state.timeData.length);
+    state.signal = lerp(state.signal, signal, signal > state.signal ? 0.35 : 0.1);
 
     const sampleRate = state.audioContext?.sampleRate || 44100;
     const binHz = sampleRate / state.analyser.fftSize;
     const bass = averageRange(state.freqData, binHz, 20, 180);
     const mid = averageRange(state.freqData, binHz, 180, 2000);
     const treble = averageRange(state.freqData, binHz, 2000, 8000);
-    const targetMix = playing ? 1 : 0.15;
+    const targetMix = playing && state.signal > 0.015 ? 1 : playing ? 0 : 0.15;
 
     state.bass = lerp(state.bass, bass * targetMix, playing ? 0.22 : 0.08);
     state.mid = lerp(state.mid, mid * targetMix, playing ? 0.18 : 0.08);
