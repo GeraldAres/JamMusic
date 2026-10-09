@@ -1,4 +1,5 @@
 @inject PlaybackState Playback
+@inject AudioEngineService AudioEngine
 @implements IDisposable
 
 <section id="upload" class="relative overflow-hidden bg-black px-4 pb-16 pt-16 md:pb-24 md:pt-20">
@@ -18,7 +19,11 @@
                     </svg>
                 </span>
                 <span>Choose a song</span>
-                <input type="file" accept=".mp3,.wav,.ogg,audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/vorbis" class="sr-only" aria-label="Choose a local audio file" />
+                <input @ref="_fileInput"
+                       type="file"
+                       accept=".mp3,.wav,.ogg,audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/vorbis"
+                       class="sr-only"
+                       aria-label="Choose a local audio file" />
             </label>
 
             <button
@@ -55,9 +60,19 @@
 </section>
 
 @code {
+    private ElementReference _fileInput;
+
     protected override void OnInitialized()
     {
         Playback.Changed += OnPlaybackChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await AudioEngine.AttachFileInputAsync(_fileInput);
+        }
     }
 
     private void OnPlaybackChanged() => InvokeAsync(StateHasChanged);

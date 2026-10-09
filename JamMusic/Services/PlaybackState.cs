@@ -81,9 +81,13 @@ public sealed class PlaybackState
     public void MarkError(string message)
     {
         Status = PlaybackStatus.Error;
-        ErrorMessage = string.IsNullOrWhiteSpace(message)
-            ? "This audio file could not be played."
-            : message.Trim();
+        ErrorMessage = NormalizeError(message);
+        Notify();
+    }
+
+    public void MarkSelectionError(string message)
+    {
+        ErrorMessage = NormalizeError(message);
         Notify();
     }
 
@@ -102,11 +106,31 @@ public sealed class PlaybackState
         Notify();
     }
 
+    public void Reset()
+    {
+        Status = PlaybackStatus.Idle;
+        CurrentTimeSeconds = 0;
+        DurationSeconds = 0;
+        ErrorMessage = null;
+        FileName = null;
+        Track.Title = "No track selected";
+        Track.Artist = string.Empty;
+        Track.AudioSource = string.Empty;
+        Track.CurrentTime = PlaybackTime.Format(0);
+        Track.TotalDuration = PlaybackTime.Format(0);
+        Notify();
+    }
+
     public double ProgressPercent => DurationSeconds <= 0
         ? 0
         : Math.Clamp(CurrentTimeSeconds / DurationSeconds * 100, 0, 100);
 
     private void Notify() => Changed?.Invoke();
+
+    private static string NormalizeError(string message) =>
+        string.IsNullOrWhiteSpace(message)
+            ? "This audio file could not be played."
+            : message.Trim();
 
     private static double ClampNonNegative(double value)
     {

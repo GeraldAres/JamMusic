@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddScoped<PlaybackState>();
+builder.Services.AddScoped<AudioEngineService>();
 
 var app = builder.Build();
 
